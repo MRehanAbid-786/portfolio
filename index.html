@@ -700,6 +700,19 @@ a.tidio-10kc66r {
   <!-- ==== ALL MAJOR JAVASCRIPT CDNS ENDS ==== -->
 
   <script src="./assets/js/script.js"></script>
+  <script>
+document.addEventListener("DOMContentLoaded", function() {
+  // Hide Tidio "Powered by" link if it appears later
+  const hideTidioBranding = () => {
+    document.querySelectorAll('a.tidio-10kc66r').forEach(el => el.remove());
+  };
+  hideTidioBranding();
+  // Also watch for future DOM changes (in case chat reloads)
+  const observer = new MutationObserver(hideTidioBranding);
+  observer.observe(document.body, { childList: true, subtree: true });
+});
+</script>
+
 <script src="//code.tidio.co/0vs07myjlojdzotlv7rmdcmra75vsqei.js" async></script>
 </body>
 <!-- Stylish Centered Popup -->
