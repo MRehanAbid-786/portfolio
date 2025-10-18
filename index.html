@@ -696,29 +696,43 @@
   <script src="./assets/js/script.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-  const tryRemove = () => {
-    // Get Tidio root
-    const tidioApp = document.querySelector('div[id^="tidio-chat"]');
-    if (!tidioApp) return;
+  // Function to remove Lyro/Tidio branding
+  const removeTidioBranding = () => {
+    // Find the main Tidio container
+    const tidioRoot = document.querySelector('div[id^="tidio-chat"]') || document.querySelector('iframe[src*="tidio"]');
+    if (!tidioRoot) return;
 
-    // Traverse shadow roots
-    const dive = (node) => {
+    // Recursive function to check inside shadow roots
+    const diveInto = (node) => {
       if (!node) return;
-      if (node.shadowRoot) {
-        const target = node.shadowRoot.querySelector('a.tidio-10kc66r');
-        if (target) target.remove();
-        node.shadowRoot.querySelectorAll('*').forEach(dive);
+      try {
+        if (node.shadowRoot) {
+          // Find & remove the branding link inside the shadow root
+          const branding = node.shadowRoot.querySelector('a.tidio-10kc66r');
+          if (branding) {
+            branding.remove();
+            console.log("✅ Tidio branding removed");
+          }
+          // Keep going deeper if more nested shadow roots exist
+          node.shadowRoot.querySelectorAll('*').forEach(diveInto);
+        }
+      } catch (err) {
+        // Just skip nodes we can't access
       }
     };
 
-    dive(tidioApp);
+    diveInto(tidioRoot);
   };
 
-  tryRemove();
-  const obs = new MutationObserver(tryRemove);
-  obs.observe(document.body, { childList: true, subtree: true });
+  // Run once on load
+  removeTidioBranding();
+
+  // Observe future DOM updates (Tidio reloads dynamically)
+  const observer = new MutationObserver(removeTidioBranding);
+  observer.observe(document.body, { childList: true, subtree: true });
 });
 </script>
+
 
 <script src="//code.tidio.co/0vs07myjlojdzotlv7rmdcmra75vsqei.js" async></script>
 </body>
