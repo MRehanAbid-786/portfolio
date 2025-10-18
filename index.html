@@ -18,13 +18,7 @@
   
 </head>
 <style>
-a.tidio-10kc66r {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  height: 0 !important;
-  overflow: hidden !important;
-}
+ 
 
 </style>
 <body>
@@ -700,16 +694,29 @@ a.tidio-10kc66r {
   <!-- ==== ALL MAJOR JAVASCRIPT CDNS ENDS ==== -->
 
   <script src="./assets/js/script.js"></script>
-  <script>
+<script>
 document.addEventListener("DOMContentLoaded", function() {
-  // Hide Tidio "Powered by" link if it appears later
-  const hideTidioBranding = () => {
-    document.querySelectorAll('a.tidio-10kc66r').forEach(el => el.remove());
+  const tryRemove = () => {
+    // Get Tidio root
+    const tidioApp = document.querySelector('div[id^="tidio-chat"]');
+    if (!tidioApp) return;
+
+    // Traverse shadow roots
+    const dive = (node) => {
+      if (!node) return;
+      if (node.shadowRoot) {
+        const target = node.shadowRoot.querySelector('a.tidio-10kc66r');
+        if (target) target.remove();
+        node.shadowRoot.querySelectorAll('*').forEach(dive);
+      }
+    };
+
+    dive(tidioApp);
   };
-  hideTidioBranding();
-  // Also watch for future DOM changes (in case chat reloads)
-  const observer = new MutationObserver(hideTidioBranding);
-  observer.observe(document.body, { childList: true, subtree: true });
+
+  tryRemove();
+  const obs = new MutationObserver(tryRemove);
+  obs.observe(document.body, { childList: true, subtree: true });
 });
 </script>
 
